@@ -4,15 +4,21 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // ConnectDB connection database
 func ConnectDB() *gorm.DB {
-	var db *gorm.DB
-	var err error
+	DBMS := "mysql"
+	HOST := "localhost"
+	PORT := "3306"
+	DATABASE := "go_orm_tutorial_db"
+	USERNAME := "root"
+	PASSWORD := "mysql"
 
-	db, err = gorm.Open("sqlite3", "test.db")
+	CONNECT := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", USERNAME, PASSWORD, HOST, PORT, DATABASE)
+
+	db, err := gorm.Open(DBMS, CONNECT)
 	if err != nil {
 		fmt.Println(err.Error())
 		panic("Failed to connect to database")
