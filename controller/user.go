@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	DB "go-orm-tutorial/db"
 	"go-orm-tutorial/model"
@@ -14,8 +15,8 @@ import (
 // UserController endpoints
 type UserController struct{}
 
-// AllUsers endpoint
-func (ctrl UserController) AllUsers(w http.ResponseWriter, r *http.Request) {
+// ReadAll endpoint
+func (ctrl UserController) ReadAll(w http.ResponseWriter, r *http.Request) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
@@ -24,43 +25,55 @@ func (ctrl UserController) AllUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
-// NewUser endpoint
-func (ctrl UserController) NewUser(w http.ResponseWriter, r *http.Request) {
+// Read endpoint
+func (ctrl UserController) Read(w http.ResponseWriter, r *http.Request) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
 	vars := mux.Vars(r)
-	name, email := vars["name"], vars["email"]
+	user := &model.User{}
+	user.ID, _ = strconv.Atoi(vars["id"])
+	db.First(&user)
+	json.NewEncoder(w).Encode(user)
+}
 
-	db.Create(&model.User{Name: name, Email: email})
+// Create endpoint
+func (ctrl UserController) Create(w http.ResponseWriter, r *http.Request) {
+	db := DB.ConnectDB()
+	defer db.Close()
+
+	user := &model.User{}
+	user.ID = 0
+	_ = json.NewDecoder(r.Body).Decode(&user)
+	db.Create(user)
 	fmt.Fprintf(w, "New User Successfully Created")
 }
 
-// DeleteUser endpoint
-func (ctrl UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+// Update endpoint
+func (ctrl UserController) Update(w http.ResponseWriter, r *http.Request) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
 	vars := mux.Vars(r)
-	name := vars["name"]
 
-	var user model.User
-	db.Where("name = ?", name).Find(&user)
-	db.Delete(&user)
-	fmt.Fprintf(w, "User Successfully Delete")
-}
-
-// UpdateUser endpoint
-func (ctrl UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	db := DB.ConnectDB()
-	defer db.Close()
-
-	vars := mux.Vars(r)
-	name, email := vars["name"], vars["email"]
-
-	var user model.User
-	db.Where("name = ?", name).Find(&user)
-	user.Email = email
+	user := &model.User{}
+	user.ID, _ = strconv.Atoi(vars["id"])
+	db.First(&user)
+	_ = json.NewDecoder(r.Body).Decode(&user)
 	db.Save(&user)
 	fmt.Fprintf(w, "User Successfully Update")
+}
+
+// Delete endpoint
+func (ctrl UserController) Delete(w http.ResponseWriter, r *http.Request) {
+	db := DB.ConnectDB()
+	defer db.Close()
+
+	vars := mux.Vars(r)
+
+	user := &model.User{}
+	user.ID, _ = strconv.Atoi(vars["id"])
+	db.First(&user)
+	db.Delete(&user)
+	fmt.Fprintf(w, "User Successfully Delete")
 }

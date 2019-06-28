@@ -7,14 +7,17 @@ import (
 )
 
 // Router create router
-func Router() *mux.Router {
-	userController := &controller.UserController{}
+func Router() (router *mux.Router) {
+	router = mux.NewRouter().StrictSlash(true)
+	crud(router, &controller.UserController{}, "users")
+	return
+}
 
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/users", userController.AllUsers).Methods("GET")
-	router.HandleFunc("/user/{name}/{email}", userController.NewUser).Methods("POST")
-	router.HandleFunc("/user/{name}/{email}", userController.UpdateUser).Methods("PUT")
-	router.HandleFunc("/user/{name}", userController.DeleteUser).Methods("DELETE")
-
-	return router
+func crud(router *mux.Router, ctrl controller.CrudController, prefix string) {
+	r := router.PathPrefix("/users").Subrouter()
+	r.HandleFunc("", ctrl.Create).Methods("POST")
+	r.HandleFunc("", ctrl.ReadAll).Methods("GET")
+	r.HandleFunc("/{id}", ctrl.Read).Methods("GET")
+	r.HandleFunc("/{id}", ctrl.Update).Methods("PUT")
+	r.HandleFunc("/{id}", ctrl.Delete).Methods("DELETE")
 }
