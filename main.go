@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"go-orm-tutorial/model"
+	"go-orm-tutorial/controller"
 
 	"github.com/gorilla/mux"
 )
@@ -16,14 +16,14 @@ func helloWorld(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests() {
 
-	user := &model.User{}
+	userController := &controller.UserController{}
 
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", helloWorld).Methods("GET")
-	myRouter.HandleFunc("/users", user.AllUsers).Methods("GET")
-	myRouter.HandleFunc("/user/{name}/{email}", user.NewUser).Methods("POST")
-	myRouter.HandleFunc("/user/{name}/{email}", user.UpdateUser).Methods("PUT")
-	myRouter.HandleFunc("/user/{name}", user.DeleteUser).Methods("DELETE")
+	myRouter.HandleFunc("/users", userController.AllUsers).Methods("GET")
+	myRouter.HandleFunc("/user/{name}/{email}", userController.NewUser).Methods("POST")
+	myRouter.HandleFunc("/user/{name}/{email}", userController.UpdateUser).Methods("PUT")
+	myRouter.HandleFunc("/user/{name}", userController.DeleteUser).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8080", myRouter))
 }
 

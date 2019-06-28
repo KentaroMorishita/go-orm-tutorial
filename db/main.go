@@ -16,7 +16,7 @@ func ConnectDB() *gorm.DB {
 	USERNAME := "root"
 	PASSWORD := "mysql"
 
-	CONNECT := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", USERNAME, PASSWORD, HOST, PORT, DATABASE)
+	CONNECT := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", USERNAME, PASSWORD, HOST, PORT, DATABASE)
 
 	db, err := gorm.Open(DBMS, CONNECT)
 	if err != nil {
