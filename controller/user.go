@@ -20,7 +20,7 @@ func (ctrl UserController) ReadAll(c echo.Context) (err error) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
-	var users []model.User
+	users := make([]*model.User, 0)
 	db.Find(&users)
 	return c.JSON(http.StatusOK, users)
 }
@@ -32,7 +32,7 @@ func (ctrl UserController) Read(c echo.Context) (err error) {
 
 	user := &model.User{}
 	user.ID, _ = strconv.Atoi(c.Param("id"))
-	db.First(&user)
+	db.First(user)
 	return c.JSON(http.StatusOK, user)
 }
 
@@ -57,11 +57,11 @@ func (ctrl UserController) Update(c echo.Context) (err error) {
 
 	user := &model.User{}
 	user.ID, _ = strconv.Atoi(c.Param("id"))
-	db.First(&user)
+	db.First(user)
 	if err = c.Bind(user); err != nil {
 		return
 	}
-	db.Save(&user)
+	db.Save(user)
 	return c.String(http.StatusOK, "User Successfully Update")
 }
 
@@ -72,8 +72,7 @@ func (ctrl UserController) Delete(c echo.Context) (err error) {
 
 	user := &model.User{}
 	user.ID, _ = strconv.Atoi(c.Param("id"))
-	db.First(&user)
-	db.Delete(&user)
-
+	db.First(user)
+	db.Delete(user)
 	return c.String(http.StatusOK, "User Successfully Delete")
 }
