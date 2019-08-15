@@ -1,79 +1,79 @@
 package controller
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	DB "go-orm-tutorial/db"
 	"go-orm-tutorial/model"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
 )
+
+var _ CrudController = (*UserController)(nil)
 
 // UserController endpoints
 type UserController struct{}
 
 // ReadAll endpoint
-func (ctrl UserController) ReadAll(w http.ResponseWriter, r *http.Request) {
+func (ctrl UserController) ReadAll(c echo.Context) (err error) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
 	var users []model.User
 	db.Find(&users)
-	json.NewEncoder(w).Encode(users)
+	return c.JSON(http.StatusOK, users)
 }
 
 // Read endpoint
-func (ctrl UserController) Read(w http.ResponseWriter, r *http.Request) {
+func (ctrl UserController) Read(c echo.Context) (err error) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
-	vars := mux.Vars(r)
 	user := &model.User{}
-	user.ID, _ = strconv.Atoi(vars["id"])
+	user.ID, _ = strconv.Atoi(c.Param("id"))
 	db.First(&user)
-	json.NewEncoder(w).Encode(user)
+	return c.JSON(http.StatusOK, user)
 }
 
 // Create endpoint
-func (ctrl UserController) Create(w http.ResponseWriter, r *http.Request) {
+func (ctrl UserController) Create(c echo.Context) (err error) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
 	user := &model.User{}
 	user.ID = 0
-	_ = json.NewDecoder(r.Body).Decode(&user)
+	if err = c.Bind(user); err != nil {
+		return
+	}
 	db.Create(user)
-	fmt.Fprintf(w, "New User Successfully Created")
+	return c.String(http.StatusOK, "New User Successfully Created")
 }
 
 // Update endpoint
-func (ctrl UserController) Update(w http.ResponseWriter, r *http.Request) {
+func (ctrl UserController) Update(c echo.Context) (err error) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
-	vars := mux.Vars(r)
-
 	user := &model.User{}
-	user.ID, _ = strconv.Atoi(vars["id"])
+	user.ID, _ = strconv.Atoi(c.Param("id"))
 	db.First(&user)
-	_ = json.NewDecoder(r.Body).Decode(&user)
+	if err = c.Bind(user); err != nil {
+		return
+	}
 	db.Save(&user)
-	fmt.Fprintf(w, "User Successfully Update")
+	return c.String(http.StatusOK, "User Successfully Update")
 }
 
 // Delete endpoint
-func (ctrl UserController) Delete(w http.ResponseWriter, r *http.Request) {
+func (ctrl UserController) Delete(c echo.Context) (err error) {
 	db := DB.ConnectDB()
 	defer db.Close()
 
-	vars := mux.Vars(r)
-
 	user := &model.User{}
-	user.ID, _ = strconv.Atoi(vars["id"])
+	user.ID, _ = strconv.Atoi(c.Param("id"))
 	db.First(&user)
 	db.Delete(&user)
-	fmt.Fprintf(w, "User Successfully Delete")
+
+	return c.String(http.StatusOK, "User Successfully Delete")
 }

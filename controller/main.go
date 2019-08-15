@@ -1,14 +1,14 @@
 package controller
 
 import (
-	"net/http"
+	"github.com/labstack/echo"
 )
 
 // CrudController interface
 type CrudController interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	ReadAll(w http.ResponseWriter, r *http.Request)
-	Read(w http.ResponseWriter, r *http.Request)
-	Update(w http.ResponseWriter, r *http.Request)
-	Delete(w http.ResponseWriter, r *http.Request)
+	Create(c echo.Context) (err error)
+	ReadAll(c echo.Context) (err error)
+	Read(c echo.Context) (err error)
+	Update(c echo.Context) (err error)
+	Delete(c echo.Context) (err error)
 }

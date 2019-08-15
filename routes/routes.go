@@ -1,23 +1,24 @@
 package routes
 
 import (
-	"go-orm-tutorial/controller"
+	"fmt"
+	ctrl "go-orm-tutorial/controller"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo"
 )
 
 // Router create router
-func Router() (router *mux.Router) {
-	router = mux.NewRouter().StrictSlash(true)
-	crud(router, &controller.UserController{}, "users")
+func Router() (e *echo.Echo) {
+	e = echo.New()
+	crud(e, &ctrl.UserController{}, "users")
 	return
 }
 
-func crud(router *mux.Router, ctrl controller.CrudController, prefix string) {
-	r := router.PathPrefix("/users").Subrouter()
-	r.HandleFunc("", ctrl.Create).Methods("POST")
-	r.HandleFunc("", ctrl.ReadAll).Methods("GET")
-	r.HandleFunc("/{id}", ctrl.Read).Methods("GET")
-	r.HandleFunc("/{id}", ctrl.Update).Methods("PUT")
-	r.HandleFunc("/{id}", ctrl.Delete).Methods("DELETE")
+func crud(e *echo.Echo, c ctrl.CrudController, prefix string) {
+	r := e.Group(fmt.Sprintf("/%s", prefix))
+	r.POST("", c.Create)
+	r.GET("", c.ReadAll)
+	r.GET("/:id", c.Read)
+	r.PUT("/:id", c.Update)
+	r.DELETE("/:id", c.Delete)
 }
