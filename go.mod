@@ -3,6 +3,7 @@ module go-orm-tutorial
 go 1.12
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
 	github.com/jinzhu/gorm v1.9.9
