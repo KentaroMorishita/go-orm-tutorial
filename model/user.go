@@ -8,8 +8,8 @@ import (
 // User Model
 type User struct {
 	ID        int        `json:"id" gorm:"primary_key"`
-	Name      string     `json:"name"`
-	Email     string     `json:"email"`
+	Name      string     `json:"name" validate:"required"`
+	Email     string     `json:"email" validate:"required,email"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at" sql:"index"`

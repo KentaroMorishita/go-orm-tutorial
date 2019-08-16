@@ -6,9 +6,9 @@ import (
 
 // CrudController interface
 type CrudController interface {
-	Create(c echo.Context) (err error)
-	ReadAll(c echo.Context) (err error)
-	Read(c echo.Context) (err error)
-	Update(c echo.Context) (err error)
-	Delete(c echo.Context) (err error)
+	Create(c echo.Context) error
+	ReadAll(c echo.Context) error
+	Read(c echo.Context) error
+	Update(c echo.Context) error
+	Delete(c echo.Context) error
 }
