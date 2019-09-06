@@ -1,6 +1,9 @@
 package controller
 
 import (
+	DB "go-orm-tutorial/db"
+
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 )
 
@@ -11,4 +14,10 @@ type CrudController interface {
 	Read(c echo.Context) error
 	Update(c echo.Context) error
 	Delete(c echo.Context) error
+}
+
+func withDB(fn func(db *gorm.DB) error) error {
+	db := DB.ConnectDB()
+	defer db.Close()
+	return fn(db)
 }
