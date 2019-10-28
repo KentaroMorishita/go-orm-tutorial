@@ -3,10 +3,14 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"time"
 
+	"go-orm-tutorial/env"
 	"go-orm-tutorial/model"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/labstack/echo"
 	"gopkg.in/go-playground/validator.v9"
@@ -16,6 +20,45 @@ var _ CrudController = (*UserController)(nil)
 
 // UserController endpoints
 type UserController struct{}
+
+func generateJwtToken(user *model.User) (string, error) {
+	jwtKey := env.Get("JWT_KEY", "")
+	jwtLifeTime := time.Hour * 72
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &model.JwtClaims{
+		user.ID,
+		user.Name,
+		user.Email,
+		user.IsAdmin,
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(jwtLifeTime).Unix(),
+		},
+	})
+	return token.SignedString([]byte(jwtKey))
+}
+
+// Login endpoint
+func (ctrl UserController) Login(c echo.Context) error {
+	email := c.FormValue("email")
+	password := c.FormValue("password")
+
+	return withDB(func(db *gorm.DB) error {
+		user := &model.User{}
+		db.Find(&user, "email=?", email)
+
+		err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+		if err != nil {
+			return echo.ErrUnauthorized
+		}
+
+		token, err := generateJwtToken(user)
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, echo.Map{"token": token})
+	})
+
+}
 
 // ReadAll endpoint
 func (ctrl UserController) ReadAll(c echo.Context) error {
