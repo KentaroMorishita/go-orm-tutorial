@@ -22,7 +22,7 @@ var _ CrudController = (*UserController)(nil)
 type UserController struct{}
 
 func generateJwtToken(user *model.User) (string, error) {
-	jwtKey := env.Get("JWT_KEY", "")
+	jwtKey := env.Get("JWT_SECRET", "")
 	jwtLifeTime := time.Hour * 72
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &model.JwtClaims{

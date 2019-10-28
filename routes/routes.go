@@ -14,7 +14,7 @@ import (
 
 var jwtConfig = middleware.JWTConfig{
 	Claims:     &model.JwtClaims{},
-	SigningKey: []byte(env.Get("JWT_KEY", "")),
+	SigningKey: []byte(env.Get("JWT_SECRET", "")),
 }
 
 // Router is setup routes
